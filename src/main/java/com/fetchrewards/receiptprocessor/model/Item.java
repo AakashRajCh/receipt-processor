@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class Item {
     private String shortDescription;
     private String price;
+
 }

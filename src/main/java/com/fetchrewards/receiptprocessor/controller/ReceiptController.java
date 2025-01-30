@@ -32,7 +32,6 @@ public class ReceiptController {
         String id = receiptService.processReceipt(receipt);
         return Collections.singletonMap("id", id);
     }
-
     /**
      * Retrieves the reward points for the receipt with the given ID.
      *

@@ -64,4 +64,5 @@ public class ReceiptControllerTest {
         mockMvc.perform(get("/receipts/invalid-id/points"))
                 .andExpect(status().isNotFound());
     }
+
 }

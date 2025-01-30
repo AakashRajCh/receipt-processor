@@ -20,7 +20,6 @@ public class ReceiptServiceTest {
         Receipt receipt = new Receipt("Walmart", "2022-06-15", "14:15",
                 List.of(new Item("Pepsi 2L", "1.99")), "1.99");
 
-
         String id = receiptService.processReceipt(receipt);
 
         assertTrue(receiptService.getPoints(id).isPresent());

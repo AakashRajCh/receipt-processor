@@ -15,4 +15,5 @@ public class Receipt {
     private String purchaseTime;
     private List<Item> items;
     private String total;
+
 }

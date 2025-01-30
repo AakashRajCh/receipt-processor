@@ -60,6 +60,7 @@ public class ReceiptService {
                 points += (int) Math.ceil(Double.parseDouble(item.getPrice()) * 0.2);
             }
         }
+
         int day = Integer.parseInt(receipt.getPurchaseDate().split("-")[2]);
         if (day % 2 != 0) {
             points += ODD_DAY_POINTS;
