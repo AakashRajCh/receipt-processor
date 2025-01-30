@@ -2,6 +2,7 @@ package com.fetchrewards.receiptprocessor.controller;
 
 import com.fetchrewards.receiptprocessor.model.Receipt;
 import com.fetchrewards.receiptprocessor.service.ReceiptService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -43,5 +44,17 @@ public class ReceiptController {
         Integer points = receiptService.getPoints(id)
                 .orElseThrow(() -> new NoSuchElementException("No receipt found for that ID."));
         return Collections.singletonMap("points", points);
+    }
+
+    /**
+     * Handles NoSuchElementException and returns a 404 Not Found status.
+     *
+     * @param ex the exception
+     * @return the error message
+     */
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNoSuchElementException(NoSuchElementException ex) {
+        return Collections.singletonMap("error", ex.getMessage());
     }
 }

@@ -2,42 +2,58 @@ package com.fetchrewards.receiptprocessor.service;
 
 import com.fetchrewards.receiptprocessor.model.Item;
 import com.fetchrewards.receiptprocessor.model.Receipt;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-class ReceiptServiceTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    private ReceiptService receiptService;
+public class ReceiptServiceTest {
 
-    @BeforeEach
-    void setUp() {
-        receiptService = new ReceiptService();
-    }
-
-    @Test
-    void testCalculatePoints() {
-        List<Item> items = Arrays.asList(
-                new Item("Mountain Dew 12PK", "6.49"),
-                new Item("Doritos Nacho Cheese", "3.35")
-        );
-
-        Receipt receipt = new Receipt("Target", "2022-01-01", "13:01", items, "9.84");
-
-        int points = receiptService.calculatePoints(receipt);
-        assertTrue(points > 0 );
-    }
+    private final ReceiptService receiptService = new ReceiptService();
 
     @Test
-    void testProcessReceipt() {
-        List<Item> items = List.of(new Item("Milk", "2.99"));
-        Receipt receipt = new Receipt("Walmart", "2022-05-10", "15:30", items, "2.99");
+    void shouldProcessReceiptAndReturnId() {
+
+        Receipt receipt = new Receipt("Walmart", "2022-06-15", "14:15",
+                List.of(new Item("Pepsi 2L", "1.99")), "1.99");
+
 
         String id = receiptService.processReceipt(receipt);
-        assertNotNull(id);
+
+        assertTrue(receiptService.getPoints(id).isPresent());
+    }
+
+    @Test
+    void shouldCalculatePointsCorrectly() {
+
+        Receipt receipt = new Receipt("Walmart", "2022-06-15", "14:15",
+                List.of(new Item("Pepsi 2L", "1.99")), "1.99");
+
+        int points = receiptService.calculatePoints(receipt);
+
+        assertEquals(23, points);
+    }
+
+    @Test
+    void shouldReturnPointsForValidReceiptId() {
+
+        Receipt receipt = new Receipt("Walmart", "2022-06-15", "14:15",
+                List.of(new Item("Pepsi 2L", "1.99")), "1.99");
+        String id = receiptService.processReceipt(receipt);
+
+        Optional<Integer> points = receiptService.getPoints(id);
+
+        assertTrue(points.isPresent());
+        assertEquals(23, points.get());
+    }
+
+    @Test
+    void shouldReturnEmptyOptionalForInvalidReceiptId() {
+        Optional<Integer> points = receiptService.getPoints("invalid-id");
+
+        assertTrue(points.isEmpty());
     }
 }
