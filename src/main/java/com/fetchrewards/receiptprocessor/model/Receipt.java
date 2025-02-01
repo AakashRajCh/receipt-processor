@@ -1,5 +1,6 @@
 package com.fetchrewards.receiptprocessor.model;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -26,7 +27,7 @@ public class Receipt {
     private String purchaseTime;
 
     @NotEmpty
-    private List<@NotNull Item> items;
+    private List<@Valid @NotNull Item> items;
 
     @NotNull
     @Pattern(regexp = "^\\d+\\.\\d{2}$", message = "Total must be a valid price format (e.g., 10.99).")
