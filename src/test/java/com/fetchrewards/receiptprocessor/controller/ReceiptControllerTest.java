@@ -53,7 +53,7 @@ public class ReceiptControllerTest {
 
     @Test
     void shouldReturnPoints_WhenReceiptIdIsValid() throws Exception {
-        Receipt receipt = new Receipt("Walmart", "2022-06-15", "14:15",
+        Receipt receipt = new Receipt("Walmart", "2021-06-15", "14:15",
                 List.of(new Item("Pepsi 2L", "1.99")), "1.99");
 
         String response = mockMvc.perform(post("/receipts/process")

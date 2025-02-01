@@ -3,7 +3,7 @@ package com.fetchrewards.receiptprocessor.controller;
 import com.fetchrewards.receiptprocessor.model.Receipt;
 import com.fetchrewards.receiptprocessor.service.ReceiptService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -25,17 +25,17 @@ public class ReceiptController {
      * Processes the given receipt and returns a unique ID.
      */
     @PostMapping("/process")
-    @ResponseStatus(HttpStatus.OK)
-    public Map<String, String> processReceipt(@Valid @RequestBody Receipt receipt) {
+    public ResponseEntity<Map<String, String>> processReceipt(@Valid @RequestBody Receipt receipt) {
         String id = receiptService.processReceipt(receipt);
-        return Collections.singletonMap("id", id);
+        return ResponseEntity.ok(Collections.singletonMap("id", id));
     }
 
     /**
      * Retrieves the reward points for the receipt with the given ID.
      */
     @GetMapping("/{id}/points")
-    public Map<String, Integer> getPoints(@PathVariable String id) {
-        return Collections.singletonMap("points", receiptService.getPoints(id));
+    public ResponseEntity<Map<String, Integer>> getPoints(@PathVariable String id) {
+        int points = receiptService.getPoints(id);
+        return ResponseEntity.ok(Collections.singletonMap("points", points));
     }
 }

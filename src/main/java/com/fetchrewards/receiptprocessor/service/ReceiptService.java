@@ -31,6 +31,15 @@ public class ReceiptService {
      * @return the unique ID of the processed receipt
      */
     public String processReceipt(Receipt receipt) {
+        if (receiptStore.containsValue(receipt)) {
+            return receiptStore.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getValue().equals(receipt))
+                    .map(Map.Entry::getKey)
+                    .findFirst()
+                    .orElse(null);
+        }
+
         String id = UUID.randomUUID().toString();
         receiptStore.put(id, receipt);
         return id;
