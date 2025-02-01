@@ -13,10 +13,11 @@ The Receipt Processor is a Spring Boot application that processes receipts and c
 - Spring Boot
 - Maven
 - Docker
+- Swagger
 
 ## Getting Started
 
-### Prerequisites
+### Prerequisites (only if not pulling Docker image)
 - Java 11 or higher
 - Maven 3.6.0 or higher
 - Docker
@@ -85,6 +86,10 @@ The Receipt Processor is a Spring Boot application that processes receipts and c
         "points": 10
     }
     ```
+## Viewing API Documentation
+To view the API documentation using Swagger:
+1. Ensure the application is running.
+2. Open a web browser and navigate to: `http://localhost:8080/swagger-ui.html`
 
 ## Running Tests
 To run unit and integration tests, use the following command:
