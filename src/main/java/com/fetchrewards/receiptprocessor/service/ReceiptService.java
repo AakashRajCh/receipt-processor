@@ -31,15 +31,6 @@ public class ReceiptService {
      * @return the unique ID of the processed receipt
      */
     public String processReceipt(Receipt receipt) {
-        if (receiptStore.containsValue(receipt)) {
-            return receiptStore.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getValue().equals(receipt))
-                    .map(Map.Entry::getKey)
-                    .findFirst()
-                    .orElse(null);
-        }
-
         String id = UUID.randomUUID().toString();
         receiptStore.put(id, receipt);
         return id;
@@ -50,6 +41,7 @@ public class ReceiptService {
      *
      * @param id the ID of the receipt
      * @return the calculated reward points
+     * @throws NoSuchReceiptException if no receipt is found for the given ID
      */
     public int getPoints(String id) {
         Receipt receipt = receiptStore.get(id);
@@ -60,52 +52,92 @@ public class ReceiptService {
     }
 
     /**
-     * Calculates the reward points for a given receipt.
+     * Calculates the total reward points for the given receipt.
      *
      * @param receipt the receipt to calculate points for
-     * @return the calculated points
+     * @return the total reward points
      */
     private int calculatePoints(Receipt receipt) {
         int points = 0;
 
-        // One point for every alphanumeric character in the retailer name.
-        points += receipt.getRetailer().replaceAll("[^a-zA-Z0-9]", "").length();
+        points += calculateRetailerPoints(receipt.getRetailer());
+        points += calculateTotalPoints(receipt.getTotal());
+        points += calculateItemPoints(receipt.getItems());
+        points += calculateDatePoints(receipt.getPurchaseDate());
+        points += calculateTimePoints(receipt.getPurchaseTime());
 
-        // 50 points if the total is a round dollar amount with no cents.
-        double total = Double.parseDouble(receipt.getTotal());
+        return points;
+    }
+
+    /**
+     * Calculates points based on the retailer's name.
+     *
+     * @param retailer the retailer's name
+     * @return the points based on the length of the retailer's name
+     */
+    private int calculateRetailerPoints(String retailer) {
+        return retailer.replaceAll("[^a-zA-Z0-9]", "").length();
+    }
+
+    /**
+     * Calculates points based on the total amount of the receipt.
+     *
+     * @param totalStr the total amount as a string
+     * @return the points based on the total amount
+     */
+    private int calculateTotalPoints(String totalStr) {
+        double total = Double.parseDouble(totalStr);
+        int points = 0;
+
         if (total == Math.floor(total)) {
             points += WHOLE_NUMBER_POINTS;
         }
 
-        // 25 points if the total is a multiple of 0.25.
         if (total % 0.25 == 0) {
             points += QUARTER_INCREMENT_POINTS;
         }
 
-        // 5 points for every two items on the receipt.
-        points += (receipt.getItems().size() / 2) * ITEM_PAIR_POINTS;
+        return points;
+    }
 
-        // If the trimmed length of the item description is a multiple of 3,
-        // multiply the price by 0.2 and round up to the nearest integer.
-        for (Item item : receipt.getItems()) {
+    /**
+     * Calculates points based on the items in the receipt.
+     *
+     * @param items the list of items
+     * @return the points based on the items
+     */
+    private int calculateItemPoints(java.util.List<Item> items) {
+        int points = (items.size() / 2) * ITEM_PAIR_POINTS;
+
+        for (Item item : items) {
             String description = item.getShortDescription().trim();
             if (description.length() % 3 == 0) {
                 points += (int) Math.ceil(Double.parseDouble(item.getPrice()) * 0.2);
             }
         }
 
-        // 6 points if the day in the purchase date is odd.
-        int day = Integer.parseInt(receipt.getPurchaseDate().split("-")[2]);
-        if (day % 2 != 0) {
-            points += ODD_DAY_POINTS;
-        }
-
-        // 10 points if the time of purchase is after 2:00pm and before 4:00pm.
-        int hour = Integer.parseInt(receipt.getPurchaseTime().split(":")[0]);
-        if (hour >= AFTERNOON_START_HOUR && hour < AFTERNOON_END_HOUR) {
-            points += AFTERNOON_HOURS_POINTS;
-        }
-
         return points;
+    }
+
+    /**
+     * Calculates points based on the purchase date.
+     *
+     * @param purchaseDate the purchase date in format YYYY-MM-DD
+     * @return the points based on the purchase date
+     */
+    private int calculateDatePoints(String purchaseDate) {
+        int day = Integer.parseInt(purchaseDate.split("-")[2]);
+        return (day % 2 != 0) ? ODD_DAY_POINTS : 0;
+    }
+
+    /**
+     * Calculates points based on the purchase time.
+     *
+     * @param purchaseTime the purchase time in format HH:MM
+     * @return the points based on the purchase time
+     */
+    private int calculateTimePoints(String purchaseTime) {
+        int hour = Integer.parseInt(purchaseTime.split(":")[0]);
+        return (hour >= AFTERNOON_START_HOUR && hour < AFTERNOON_END_HOUR) ? AFTERNOON_HOURS_POINTS : 0;
     }
 }

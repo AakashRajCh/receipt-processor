@@ -6,7 +6,6 @@ The Receipt Processor is a Spring Boot application that processes receipts and c
 ## Features
 - Process receipts and generate unique IDs.
 - Calculate reward points for processed receipts.
-- Handle duplicate receipts and invalid receipt IDs.
 
 ## Technologies Used
 - Java
